@@ -41,3 +41,18 @@ CREATE TABLE order_items (
     price REAL,
     freight_value REAL
 );
+
+-- Товары: одна строка = один товар.
+-- Источник: olist_products_dataset.csv.
+-- Написание lenght сохранено из заголовков исходного CSV.
+CREATE TABLE products (
+    product_id TEXT,
+    product_category_name TEXT,
+    product_name_lenght INTEGER,
+    product_description_lenght INTEGER,
+    product_photos_qty INTEGER,
+    product_weight_g INTEGER,
+    product_length_cm INTEGER,
+    product_height_cm INTEGER,
+    product_width_cm INTEGER
+);
