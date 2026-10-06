@@ -28,3 +28,16 @@ CREATE TABLE customers (
     customer_city TEXT,
     customer_state TEXT
 );
+
+-- Состав заказов: одна строка = одна товарная позиция.
+-- Источник: olist_order_items_dataset.csv.
+-- Номер позиции уникален внутри заказа, а не во всей таблице.
+CREATE TABLE order_items (
+    order_id TEXT,
+    order_item_id INTEGER,
+    product_id TEXT,
+    seller_id TEXT,
+    shipping_limit_date TEXT,
+    price REAL,
+    freight_value REAL
+);
