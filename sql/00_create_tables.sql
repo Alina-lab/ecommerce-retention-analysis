@@ -56,3 +56,10 @@ CREATE TABLE products (
     product_height_cm INTEGER,
     product_width_cm INTEGER
 );
+
+-- Перевод категорий: одна строка = одна исходная категория.
+-- Источник: product_category_name_translation.csv.
+CREATE TABLE category_translation (
+    product_category_name TEXT,
+    product_category_name_english TEXT
+);
