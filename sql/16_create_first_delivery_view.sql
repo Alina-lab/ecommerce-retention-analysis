@@ -18,7 +18,7 @@
 -- На исходных CSV orders/customers итог:
 -- buyers = 49452, unique_buyers = 49452, on_time = 46651,
 -- late = 2799, unknown_delivery = 2, repeat_before_delivery = 526.
--- Подтверждение в пользовательском DBeaver ожидается.
+-- Все шесть итоговых показателей подтверждены в пользовательском DBeaver 2026-10-07.
 CREATE VIEW buyer_first_delivery AS
 WITH delivery_summary AS (
     SELECT
