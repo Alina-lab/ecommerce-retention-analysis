@@ -13,7 +13,7 @@
 -- late: buyers 2799, returned_buyers 59, rate 2.11%, early repeats 26.
 -- unknown_delivery: buyers 2, returned_buyers 0, rate 0.00%, early repeats 0.
 -- Суммы по группам: buyers 49452, returned_buyers 1358, early repeats 526.
--- Фактическое выполнение в пользовательском DBeaver ещё ожидается.
+-- Все три строки подтверждены в пользовательском DBeaver 2026-10-07.
 SELECT
     d.delivery_group,
     COUNT(*) AS buyers,
