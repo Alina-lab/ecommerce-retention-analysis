@@ -47,7 +47,8 @@ WHERE purchase_number = 1
         <= '2018-07-31 23:59:59';
 
 -- Проверка: одна строка на покупателя, метрика совпадает с этапом 8.
--- Результат: total_rows = 49452, unique_buyers = 49452,
+-- Результат подтверждён в DBeaver 2026-10-07.
+-- total_rows = 49452, unique_buyers = 49452,
 -- returned_buyers = 1358, repeat_purchase_rate_180 = 2.75.
 SELECT
     COUNT(*) AS total_rows,
