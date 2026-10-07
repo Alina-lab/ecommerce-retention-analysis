@@ -9,7 +9,7 @@
 -- Проверено в SQLite на исходных CSV orders/customers:
 -- first_orders = 49609, buyers = 49452, missing_delivery_dates = 2,
 -- missing_estimated_dates = 0, delivery_before_purchase = 0.
--- Подтверждение результата в пользовательском DBeaver ещё ожидается.
+-- Результат подтверждён в пользовательском DBeaver 2026-10-07.
 WITH first_orders AS (
     SELECT
         r.customer_unique_id,
