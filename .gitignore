@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+data/*.csv
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+reports/olist_report.html

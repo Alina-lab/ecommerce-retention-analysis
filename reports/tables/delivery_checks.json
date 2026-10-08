@@ -1,0 +1,34 @@
+{
+  "source": "SQL results verified in the project on 2026-10-08",
+  "observation_cutoff": "2018-07-31 23:59:59",
+  "results": [
+    {
+      "check": "after_delivery_in_purchase_180",
+      "group": "on_time",
+      "buyers": 46651,
+      "returned_buyers": 823,
+      "repeat_rate": 0.017641636835223254
+    },
+    {
+      "check": "after_delivery_in_purchase_180",
+      "group": "late",
+      "buyers": 2799,
+      "returned_buyers": 35,
+      "repeat_rate": 0.012504465880671669
+    },
+    {
+      "check": "delivery_180",
+      "group": "on_time",
+      "buyers": 44279,
+      "returned_buyers": 829,
+      "repeat_rate": 0.01872219336480047
+    },
+    {
+      "check": "delivery_180",
+      "group": "late",
+      "buyers": 2332,
+      "returned_buyers": 32,
+      "repeat_rate": 0.0137221269296741
+    }
+  ]
+}
