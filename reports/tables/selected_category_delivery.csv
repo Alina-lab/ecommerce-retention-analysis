@@ -1,5 +1,0 @@
-first_category,delivery_group,buyers,returned_buyers,repeat_rate,repeat_before_delivery
-cool_stuff,late,111,1,0.009009009009009009,0
-cool_stuff,on_time,2255,29,0.012860310421286032,8
-fashion_bags_accessories,late,52,3,0.057692307692307696,2
-fashion_bags_accessories,on_time,976,46,0.0471311475409836,21

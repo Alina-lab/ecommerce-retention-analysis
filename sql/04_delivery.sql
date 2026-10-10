@@ -35,7 +35,7 @@ SELECT
     ) AS delivery_before_purchase
 FROM first_orders;
 
--- Витрина доставки: 46 651 вовремя, 2 799 с опозданием, 2 неизвестно
+-- Одна строка на покупателя; неизвестная доставка имеет NULL вместо даты.
 DROP VIEW IF EXISTS buyer_first_delivery;
 CREATE VIEW buyer_first_delivery AS
 WITH delivery_summary AS (
@@ -88,6 +88,7 @@ SELECT
     SUM(CASE WHEN d.delivery_group = 'on_time' THEN 1 ELSE 0 END) AS on_time,
     SUM(CASE WHEN d.delivery_group = 'late' THEN 1 ELSE 0 END) AS late,
     SUM(CASE WHEN d.delivery_group = 'unknown_delivery' THEN 1 ELSE 0 END) AS unknown_delivery,
+    SUM(CASE WHEN d.first_order_count > 1 THEN 1 ELSE 0 END) AS simultaneous_first_buyers,
     SUM(
         CASE
             WHEN r.returned_180 = 1
@@ -118,28 +119,6 @@ JOIN buyer_first_delivery AS d
 GROUP BY d.delivery_group
 ORDER BY buyers DESC;
 
--- Доставка внутри месячных групп
-SELECT
-    r.first_purchase_month,
-    d.delivery_group,
-    COUNT(*) AS buyers,
-    SUM(r.returned_180) AS returned_buyers,
-    ROUND(100.0 * AVG(r.returned_180), 2) AS repeat_purchase_rate_180,
-    SUM(
-        CASE
-            WHEN r.returned_180 = 1
-                AND r.next_purchase_at <= d.first_purchase_delivered_at
-            THEN 1 ELSE 0
-        END
-    ) AS repeat_before_delivery
-FROM buyer_retention_180 AS r
-JOIN buyer_first_delivery AS d
-    ON r.customer_unique_id = d.customer_unique_id
-WHERE d.delivery_group IN ('on_time', 'late')
-    AND r.first_purchase_month BETWEEN '2017-01' AND '2018-01'
-GROUP BY r.first_purchase_month, d.delivery_group
-ORDER BY r.first_purchase_month, d.delivery_group;
-
 -- Доставка внутри двух выбранных категорий
 SELECT
     c.first_category,
@@ -165,7 +144,8 @@ WHERE c.first_category IN ('fashion_bags_accessories', 'cool_stuff')
 GROUP BY c.first_category, d.delivery_group
 ORDER BY c.first_category, d.delivery_group;
 
--- Повтор после получения: все последующие заказы, два окна по 180 дней
+-- Экспортировать этот SELECT в data/delivery_after_receipt.csv.
+-- Считаются все последующие заказы; next_purchase_at здесь недостаточно.
 WITH delivered_purchases AS (
     SELECT DISTINCT
         c.customer_unique_id,
@@ -200,24 +180,22 @@ repeat_flags AS (
     GROUP BY b.customer_unique_id, b.delivery_group, b.first_purchase_delivered_at
 )
 SELECT
-    'after_delivery_in_purchase_180' AS check_name,
+    'after_delivery_in_purchase_180' AS window,
     delivery_group,
     COUNT(*) AS buyers,
-    SUM(returned_after_delivery_in_purchase_window) AS returned_buyers,
-    ROUND(100.0 * AVG(returned_after_delivery_in_purchase_window), 2) AS repeat_rate_pct
+    SUM(returned_after_delivery_in_purchase_window) AS returned_buyers
 FROM repeat_flags
 GROUP BY delivery_group
 UNION ALL
 SELECT
-    'delivery_180' AS check_name,
+    'delivery_180' AS window,
     delivery_group,
     COUNT(*) AS buyers,
-    SUM(returned_in_delivery_window) AS returned_buyers,
-    ROUND(100.0 * AVG(returned_in_delivery_window), 2) AS repeat_rate_pct
+    SUM(returned_in_delivery_window) AS returned_buyers
 FROM repeat_flags
 WHERE DATETIME(first_purchase_delivered_at, '+180 days') <= '2018-07-31 23:59:59'
 GROUP BY delivery_group
-ORDER BY check_name, delivery_group;
+ORDER BY window, delivery_group;
 
 -- Итоговая выгрузка: сохранить результат как data/buyer_analysis.csv
 SELECT

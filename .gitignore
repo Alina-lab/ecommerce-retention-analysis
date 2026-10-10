@@ -1,7 +1,10 @@
+.venv/
+venv/
+.ipynb_checkpoints/
 __pycache__/
 *.py[cod]
-data/*.csv
-data/*.db
-data/*.sqlite
-data/*.sqlite3
-reports/olist_report.html
+.vscode/
+.idea/
+data/*
+!data/buyer_analysis.csv
+!data/delivery_after_receipt.csv

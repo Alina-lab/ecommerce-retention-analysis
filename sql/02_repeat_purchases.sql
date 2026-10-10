@@ -33,7 +33,7 @@ SELECT
     ) AS invalid_first_dates
 FROM first_purchases;
 
--- Витрина и контрольные значения: 49 452 покупателя, 1 358 повторных (2,75%)
+-- Одна строка на покупателя с полным окном.
 DROP VIEW IF EXISTS buyer_retention_180;
 CREATE VIEW buyer_retention_180 AS
 WITH purchase_dates AS (
@@ -85,33 +85,3 @@ SELECT first_purchase_month, COUNT(*) AS eligible_buyers,
 FROM buyer_retention_180
 GROUP BY first_purchase_month
 ORDER BY first_purchase_month;
-
--- Число одновременных первых заказов у одного покупателя
-WITH orders_with_first_date AS (
-    SELECT
-        c.customer_unique_id,
-        o.order_purchase_timestamp AS purchase_at,
-        MIN(o.order_purchase_timestamp) OVER (
-            PARTITION BY c.customer_unique_id
-        ) AS first_purchase_at
-    FROM orders AS o
-    JOIN customers AS c
-        ON o.customer_id = c.customer_id
-    WHERE o.order_status = 'delivered'
-),
-first_order_counts AS (
-    SELECT
-        customer_unique_id,
-        COUNT(*) AS first_orders
-    FROM orders_with_first_date
-    WHERE purchase_at = first_purchase_at
-        AND DATETIME(first_purchase_at, '+180 days')
-            <= '2018-07-31 23:59:59'
-    GROUP BY customer_unique_id
-)
-SELECT
-    first_orders,
-    COUNT(*) AS buyers
-FROM first_order_counts
-GROUP BY first_orders
-ORDER BY first_orders;

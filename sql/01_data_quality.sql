@@ -55,24 +55,11 @@ SELECT
     COUNT(DISTINCT product_id) AS unique_products,
     SUM(
         CASE
-            WHEN product_category_name IS NULL THEN 1
+            WHEN product_category_name IS NULL
+                OR TRIM(product_category_name) = '' THEN 1
             ELSE 0
         END
     ) AS products_without_category
-FROM products;
-
-SELECT
-    COUNT(*) AS total_products,
-    SUM(
-        CASE WHEN product_category_name IS NULL
-            THEN 1 ELSE 0
-        END
-    ) AS null_categories,
-    SUM(
-        CASE WHEN TRIM(product_category_name) = ''
-            THEN 1 ELSE 0
-        END
-    ) AS empty_categories
 FROM products;
 
 SELECT
@@ -112,61 +99,6 @@ WHERE p.product_category_name IS NOT NULL
 GROUP BY p.product_category_name
 ORDER BY products_without_translation DESC;
 
--- Количество товаров и категорий в доставленных заказах
-SELECT
-    CASE
-        WHEN p.product_category_name IS NULL
-            OR TRIM(p.product_category_name) = ''
-        THEN 'unknown_category'
-        WHEN t.product_category_name IS NULL
-        THEN p.product_category_name
-        ELSE t.product_category_name_english
-    END AS category,
-    COUNT(DISTINCT o.order_id) AS delivered_orders
-FROM orders AS o
-JOIN order_items AS i
-    ON o.order_id = i.order_id
-LEFT JOIN products AS p
-    ON i.product_id = p.product_id
-LEFT JOIN category_translation AS t
-    ON p.product_category_name = t.product_category_name
-WHERE o.order_status = 'delivered'
-GROUP BY category
-ORDER BY delivered_orders DESC;
-
-WITH order_categories AS (
-    SELECT
-        o.order_id,
-        COUNT(DISTINCT
-            CASE
-                WHEN TRIM(p.product_category_name) <> ''
-                THEN p.product_category_name
-            END
-        ) AS known_categories,
-        MAX(
-            CASE
-                WHEN p.product_category_name IS NULL
-                    OR TRIM(p.product_category_name) = ''
-                THEN 1
-                ELSE 0
-            END
-        ) AS has_unknown_category
-    FROM orders AS o
-    JOIN order_items AS i
-        ON o.order_id = i.order_id
-    LEFT JOIN products AS p
-        ON i.product_id = p.product_id
-    WHERE o.order_status = 'delivered'
-    GROUP BY o.order_id
-)
-SELECT
-    known_categories,
-    has_unknown_category,
-    COUNT(*) AS delivered_orders
-FROM order_categories
-GROUP BY known_categories, has_unknown_category
-ORDER BY known_categories, has_unknown_category;
-
 -- Полнота последних месяцев наблюдения
 SELECT
     SUBSTR(order_purchase_timestamp, 1, 7) AS purchase_month,
@@ -180,17 +112,3 @@ SELECT
 FROM orders
 GROUP BY purchase_month
 ORDER BY purchase_month;
-
-SELECT
-    SUBSTR(order_purchase_timestamp, 1, 10) AS purchase_day,
-    COUNT(*) AS total_orders,
-    SUM(
-        CASE
-            WHEN order_status = 'delivered' THEN 1
-            ELSE 0
-        END
-    ) AS delivered_orders
-FROM orders
-WHERE order_purchase_timestamp >= '2018-08-20'
-GROUP BY purchase_day
-ORDER BY purchase_day;

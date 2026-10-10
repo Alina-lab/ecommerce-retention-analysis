@@ -1,0 +1,5 @@
+window,delivery_group,buyers,returned_buyers
+after_delivery_in_purchase_180,on_time,46651,823
+after_delivery_in_purchase_180,late,2799,35
+delivery_180,on_time,44279,829
+delivery_180,late,2332,32

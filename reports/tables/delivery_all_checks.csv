@@ -1,7 +1,0 @@
-check,group,buyers,returned_buyers,repeat_rate
-purchase_180,on_time,46651,1299,0.027845062270905233
-purchase_180,late,2799,59,0.021078956770275097
-after_delivery_in_purchase_180,on_time,46651,823,0.017641636835223254
-after_delivery_in_purchase_180,late,2799,35,0.012504465880671669
-delivery_180,on_time,44279,829,0.01872219336480047
-delivery_180,late,2332,32,0.0137221269296741
