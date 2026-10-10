@@ -1,8 +1,7 @@
--- SQLite. Нужна buyer_retention_180 из 02_repeat_purchases.sql.
--- Категория берётся по всем товарам первых одновременных заказов.
--- Несколько известных категорий = mixed_categories; пропуск = unknown_category.
+-- Категория первой покупки определяется по всем товарам одновременных первых заказов.
+-- Несколько известных категорий дают mixed_categories, а любой пропуск — unknown_category.
+-- Представление buyer_first_category содержит одну строку на покупателя.
 
--- Первая категория: одна строка на покупателя
 DROP VIEW IF EXISTS buyer_first_category;
 CREATE VIEW buyer_first_category AS
 WITH first_baskets AS (
@@ -55,7 +54,6 @@ SELECT
     ) AS missing_groups
 FROM buyer_first_category;
 
--- Доли повторных покупателей по всем категориям
 SELECT
     c.first_category,
     COUNT(*) AS buyers,
@@ -67,7 +65,6 @@ JOIN buyer_first_category AS c
 GROUP BY c.first_category
 ORDER BY buyers DESC, c.first_category;
 
--- Сумки и Cool stuff по месяцам: январь 2017 — январь 2018
 SELECT
     r.first_purchase_month,
     c.first_category,

@@ -1,9 +1,9 @@
--- SQLite. Нужны buyer_retention_180 и buyer_first_category.
--- Вовремя = все первые заказы получены не позже обещанного календарного дня.
--- Опоздание = хотя бы один позже; неизвестная дата = unknown_delivery.
--- Полное получение = самая поздняя дата получения первых одновременных заказов.
+-- Сравниваем повторы при доставке первых заказов вовремя и с опозданием.
+-- Вовремя — все заказы получены не позже обещанного дня; полное получение — последняя доставка.
+-- Повторы после получения проверяются по всем последующим заказам.
+-- Предпоследний SELECT нужно экспортировать в data/delivery_after_receipt.csv,
+-- последний — в data/buyer_analysis.csv.
 
--- Проверка фактических и обещанных дат
 WITH first_orders AS (
     SELECT
         r.customer_unique_id,
@@ -35,7 +35,6 @@ SELECT
     ) AS delivery_before_purchase
 FROM first_orders;
 
--- Одна строка на покупателя; неизвестная доставка имеет NULL вместо даты.
 DROP VIEW IF EXISTS buyer_first_delivery;
 CREATE VIEW buyer_first_delivery AS
 WITH delivery_summary AS (
@@ -100,7 +99,6 @@ FROM buyer_first_delivery AS d
 JOIN buyer_retention_180 AS r
     ON d.customer_unique_id = r.customer_unique_id;
 
--- Основная метрика по доставке
 SELECT
     d.delivery_group,
     COUNT(*) AS buyers,
@@ -119,7 +117,6 @@ JOIN buyer_first_delivery AS d
 GROUP BY d.delivery_group
 ORDER BY buyers DESC;
 
--- Доставка внутри двух выбранных категорий
 SELECT
     c.first_category,
     d.delivery_group,
@@ -144,8 +141,6 @@ WHERE c.first_category IN ('fashion_bags_accessories', 'cool_stuff')
 GROUP BY c.first_category, d.delivery_group
 ORDER BY c.first_category, d.delivery_group;
 
--- Экспортировать этот SELECT в data/delivery_after_receipt.csv.
--- Считаются все последующие заказы; next_purchase_at здесь недостаточно.
 WITH delivered_purchases AS (
     SELECT DISTINCT
         c.customer_unique_id,
@@ -197,7 +192,6 @@ WHERE DATETIME(first_purchase_delivered_at, '+180 days') <= '2018-07-31 23:59:59
 GROUP BY delivery_group
 ORDER BY window, delivery_group;
 
--- Итоговая выгрузка: сохранить результат как data/buyer_analysis.csv
 SELECT
     r.customer_unique_id, r.first_purchase_at, r.first_purchase_month,
     r.next_purchase_at, r.returned_180, c.first_category,

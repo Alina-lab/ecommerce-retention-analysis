@@ -1,7 +1,6 @@
--- SQLite. Проверка импорта, связей, состава покупок и периода.
--- Выполнить после импорта пяти CSV; исправить ошибки до расчёта метрик.
+-- Файл помогает проверить импорт, связи между таблицами и пропуски.
+-- Запросы показывают дубликаты ключей и полноту периода до расчёта метрик.
 
--- Заказы и покупатели
 SELECT
     COUNT(*) AS total_orders,
     COUNT(DISTINCT order_id) AS unique_orders
@@ -25,7 +24,6 @@ FROM orders AS o
 LEFT JOIN customers AS c
     ON o.customer_id = c.customer_id;
 
--- Позиции заказов и связь с заказами
 SELECT
     COUNT(*) AS total_items,
     COUNT(DISTINCT order_id) AS orders_with_items
@@ -49,7 +47,6 @@ WHERE i.order_id IS NULL
 GROUP BY o.order_status
 ORDER BY orders_without_items DESC;
 
--- Товары, категории и пропуски
 SELECT
     COUNT(*) AS total_products,
     COUNT(DISTINCT product_id) AS unique_products,
@@ -73,7 +70,6 @@ FROM order_items AS i
 LEFT JOIN products AS p
     ON i.product_id = p.product_id;
 
--- Перевод названий категорий
 SELECT
     COUNT(*) AS total_translations,
     COUNT(DISTINCT product_category_name) AS unique_categories,
@@ -99,7 +95,6 @@ WHERE p.product_category_name IS NOT NULL
 GROUP BY p.product_category_name
 ORDER BY products_without_translation DESC;
 
--- Полнота последних месяцев наблюдения
 SELECT
     SUBSTR(order_purchase_timestamp, 1, 7) AS purchase_month,
     COUNT(*) AS total_orders,

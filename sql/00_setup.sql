@@ -1,5 +1,6 @@
--- SQLite. Создание пяти исходных таблиц; после этого импортировать CSV.
--- Если данные уже загружены, повторный импорт не нужен.
+-- Файл создаёт пять таблиц SQLite и индексы для данных Olist.
+-- Если таблицы уже заполнены, повторный запуск сохраняет их содержимое.
+
 CREATE TABLE IF NOT EXISTS orders (
     order_id TEXT,
     customer_id TEXT,
@@ -46,7 +47,6 @@ CREATE TABLE IF NOT EXISTS category_translation (
     product_category_name_english TEXT
 );
 
--- Индексы ускоряют соединения и поиск первых/последующих заказов.
 CREATE INDEX IF NOT EXISTS idx_customers_customer_id ON customers(customer_id);
 CREATE INDEX IF NOT EXISTS idx_customers_unique_id ON customers(customer_unique_id);
 CREATE INDEX IF NOT EXISTS idx_orders_customer_purchase ON orders(customer_id, order_status, order_purchase_timestamp);

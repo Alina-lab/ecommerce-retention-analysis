@@ -1,9 +1,7 @@
--- SQLite. Покупатель = customer_unique_id; только delivered.
--- Основная метрика: повтор за 180 дней от первой наблюдаемой покупки.
--- Одновременные покупки объединены; следующая имеет более позднее время.
--- Полное окно заканчивается не позже 2018-07-31 23:59:59.
+-- Повтор — доставленный заказ в течение 180 дней после первой наблюдаемой покупки.
+-- Одновременные покупки объединяются; учитываются только покупатели с полным окном.
+-- В buyer_retention_180 получается одна строка на покупателя.
 
--- Полнота окна наблюдения по всей базе
 WITH first_purchases AS (
     SELECT
         c.customer_unique_id,
@@ -33,7 +31,6 @@ SELECT
     ) AS invalid_first_dates
 FROM first_purchases;
 
--- Одна строка на покупателя с полным окном.
 DROP VIEW IF EXISTS buyer_retention_180;
 CREATE VIEW buyer_retention_180 AS
 WITH purchase_dates AS (
@@ -78,7 +75,6 @@ SELECT
     ROUND(100.0 * AVG(returned_180), 2) AS repeat_purchase_rate_180
 FROM buyer_retention_180;
 
--- Показатели по месяцу первой покупки
 SELECT first_purchase_month, COUNT(*) AS eligible_buyers,
     SUM(returned_180) AS returned_buyers,
     ROUND(100.0 * AVG(returned_180), 2) AS repeat_purchase_rate_180
